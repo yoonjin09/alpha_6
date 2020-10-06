@@ -5,9 +5,11 @@ import java.util.Scanner;
 public class board {
 	int [][]board;
 	int userTag;
-	board() {
+	Scanner n;
+	public board() {
 		this.board=initializeBoard();
 		userTag=1;
+		n=new Scanner(System.in);
 	}
 	
 	private int[][] initializeBoard(){ //initialize the board and input 0 to all place
@@ -25,8 +27,8 @@ public class board {
 		int x2=move2.getX();
 		int y1=move1.getY();
 		int y2=move2.getY();
-		if(x1<1||y1<1||x2<1||y2<1) return false;
-		else if(x1>19||y1>19||x2>19||y2>19) return false;
+		if(x1<0||y1<0||x2<0||y2<0) return false;
+		else if(x1>18||y1>18||x2>18||y2>18) return false;
 		else if(this.board[x1][y1]!=0) return false;
 		else if(this.board[x2][y2]!=0) return false;
 		else return true;
@@ -42,7 +44,7 @@ public class board {
 	}
 	
 	public void printBoard() {
-		System.out.println("y\t1 2 3 4 5 6 7 8 9 a 1 2 3 4 5 6 7 8 9");
+		System.out.println("x\\y\t1 2 3 4 5 6 7 8 9 a 1 2 3 4 5 6 7 8 9\n");
 		for(int i =0; i< 19; i++) {
 			System.out.printf("%d\t", i+1);
 			for(int j=0; j<19; j++) {
@@ -67,23 +69,23 @@ public class board {
 			System.out.println("The board is full");
 			return;
 		}
-		Scanner n = new Scanner(System.in);
+		
 		int x1=0, x2=0, y1=0, y2=0;
 		cor move1, move2;
 		boolean checker=false;
 				
 		do { //checker for invalid input
 			if(checker) System.out.println("wrong input! plz retry!");
-			System.out.println("input syntax: x1 y1 x2 y2");
-			x1=n.nextInt();
-			y1=n.nextInt();
-			x2=n.nextInt();
-			y2=n.nextInt();
+			System.out.println("input syntax: x1 y1 x2 y2!!");
+			x1=this.n.nextInt()-1;
+			y1=this.n.nextInt()-1;
+			x2=this.n.nextInt()-1;
+			y2=this.n.nextInt()-1;
+			this.n.nextLine();
 			move1=new cor(x1, y1);
 			move2=new cor(x2, y2);
 		}while(checker=(!isValidInput(move1, move2)));		
-		n.close();
-		
+			
 		enterInput(move1, move2);
 	}
 	
@@ -96,6 +98,7 @@ public class board {
 			getInput();
 			printBoard();
 		}while(checkWinCondition());
+		n.close();
 	}
 	
 }//end of class
