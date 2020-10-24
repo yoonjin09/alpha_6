@@ -53,6 +53,7 @@ public class board {
 			System.out.println();
 		}
 	}
+	
 	public void enterInput(cor move1, cor move2) {
 		this.board[move1.getX()][move1.getY()]=this.userTag;
 		this.board[move2.getX()][move2.getY()]=this.userTag;
@@ -89,7 +90,8 @@ public class board {
 		enterInput(move1, move2);
 	}
 	
-	public boolean checkWinCondition() {
+	public boolean checkWinCondition() {//return true for no winner, false for a winner
+		
 		return true;
 	}
 	
