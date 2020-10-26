@@ -60,7 +60,7 @@ public class board {
 		toggleUserTag();		
 	}
 	
-	public void toggleUserTag() {
+	public void toggleUserTag() { //userTag only switches between 1 and 2
 		if(this.userTag==1) this.userTag=2;
 		else if(this.userTag==2) this.userTag=1;
 	}
@@ -99,6 +99,7 @@ public class board {
 		do {
 			getInput();
 			printBoard();
+			evaluate.readBoWDir(this.board, this.userTag);
 		}while(checkWinCondition());
 		n.close();
 	}
