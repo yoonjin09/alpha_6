@@ -1,7 +1,8 @@
 package alpha_6;
 
 public class evaluate { //
-		board scoreForBlack, scoreForwhite;
+		//board scoreForBlack, scoreForwhite;
+		static int [][]totalScore= new int[19][19];
 		static cor move= new cor();
 	/*
 	 * read board left to right, top to bottom, left top to right bottom, 
@@ -19,7 +20,7 @@ public class evaluate { //
 					for(j=0; j<19; j++) {
 						oneRow[j]=rawData[i][j];
 					}
-					evaGiveScoreC1(oneRow, 19, userTag, move, 0);
+					evaGiveScoreC1(oneRow, 19, userTag, move.x, move.y, 0);
 					break;
 				}
 			}
@@ -33,7 +34,7 @@ public class evaluate { //
 					for(j=0; j<19; j++) {
 						oneRow[j]=rawData[j][i];
 					}
-					evaGiveScoreC1(oneRow, 19, userTag, move, 1);
+					evaGiveScoreC1(oneRow, 19, userTag, move.x, move.y, 1);
 					break;
 				}
 			}
@@ -50,7 +51,7 @@ public class evaluate { //
 						oneRow[j]=rawData[k][j];
 						k++;
 					}
-					evaGiveScoreC1(oneRow, 19-i, userTag, move, 2);
+					evaGiveScoreC1(oneRow, 19-i, userTag, move.x, move.y, 2);
 					break;
 				}
 				k++;
@@ -67,7 +68,7 @@ public class evaluate { //
 						oneRow[k]=rawData[k][j];
 						k++;
 					}
-					evaGiveScoreC1(oneRow, k, userTag, move, 2);
+					evaGiveScoreC1(oneRow, k, userTag, move.x, move.y, 2);
 					break;
 				}
 				k++;
@@ -85,7 +86,7 @@ public class evaluate { //
 						oneRow[j]=rawData[k][j];
 						k--;
 					}
-					evaGiveScoreC1(oneRow, i+1, userTag, move, 3);
+					evaGiveScoreC1(oneRow, i+1, userTag, move.x, move.y, 3);
 					break;
 				}
 				k--;	
@@ -104,7 +105,7 @@ public class evaluate { //
 						k--;
 						pos++;
 					}
-					evaGiveScoreC1(oneRow, 18-i, userTag, move, 3);
+					evaGiveScoreC1(oneRow, 18-i, userTag, move.x, move.y, 3);
 					break;
 				}
 				k--;
@@ -126,8 +127,8 @@ public class evaluate { //
 	 * one_rawData[] 는 array 값
 	 */
 	 
-	public void evaGiveScoreC1(int start_index_x, int start_index_y, int direction, int arraylength, int usertag, int one_rawData[]) { 
-		int[][] totalScore = new int[19][19]; // 이거는 일단 없는거라고 생각하자
+	public static void evaGiveScoreC1(int one_rawData[], int direction, int usertag, int start_index_x, int start_index_y, int arraylength) { 
+		//int[][] totalScore = new int[19][19]; // 이거는 일단 없는거라고 생각하자
 		
 		int[] dummycell= new int[19]; //만약 상대편 돌에 의해 쓰레기 cell 이 나올 때를 대비.
 		int notusertag=0; // usertag 의 반대. 1이면 2, 2이면 1.
@@ -196,26 +197,26 @@ public class evaluate { //
 		int x = start_index_x;
 		int y = start_index_y;
 		switch(direction) {
-			case 1: 
+			case 0: 
 				for(int i=0; i<19; i++) {
 					totalScore[x][i] += one_rawScore[i];
 				}
 				break;
 				
-			case 2:
+			case 1:
 				for(int i=0; i< 19; i++) {
 					totalScore[i][y] += one_rawScore[i];
 				}
 				break;
 				
-			case 3:
+			case 2:
 				for(int i=0; i< arraylength; i++) {
 					totalScore[x][y] +=one_rawScore[i];
 					x++; y++;
 				}
 				break;
 				
-			case 4:
+			case 3:
 				for(int i=0; i< arraylength; i++) {
 					totalScore[x][y]+=one_rawScore[i];
 					x--; y--;
@@ -225,6 +226,16 @@ public class evaluate { //
 			default :
 				break;
 		}
+		
+		System.out.println("x\\y\t1 2 3 4 5 6 7 8 9 a 1 2 3 4 5 6 7 8 9\n");
+		for(int i =0; i< 19; i++) {
+			System.out.printf("%d\t", i+1);
+			for(int j=0; j<19; j++) {
+				System.out.printf("%d ", totalScore[i][j]);
+			}
+			System.out.println();
+		}
+	}
 		
 /*
 	public static void evaGiveScoreC1(int[] oneRow, int rowLength, int userTag, cor move, int dir) { 
