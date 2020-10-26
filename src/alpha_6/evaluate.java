@@ -20,7 +20,7 @@ public class evaluate { //
 					for(j=0; j<19; j++) {
 						oneRow[j]=rawData[i][j];
 					}
-					evaGiveScoreC1(oneRow, 19, userTag, move.x, move.y, 0);
+					evaGiveScoreC1(oneRow, 19, userTag, move.x, move.y, 1);
 					break;
 				}
 			}
@@ -34,7 +34,7 @@ public class evaluate { //
 					for(j=0; j<19; j++) {
 						oneRow[j]=rawData[j][i];
 					}
-					evaGiveScoreC1(oneRow, 19, userTag, move.x, move.y, 1);
+					evaGiveScoreC1(oneRow, 19, userTag, move.x, move.y, 0);
 					break;
 				}
 			}
@@ -127,13 +127,17 @@ public class evaluate { //
 	 * one_rawData[] 는 array 값
 	 */
 	 
-	public static void evaGiveScoreC1(int one_rawData[], int direction, int usertag, int start_index_x, int start_index_y, int arraylength) { 
+	public static void evaGiveScoreC1(int one_rawData[], int arraylength, int usertag, int start_index_x, int start_index_y,  int direction) { 
 		//int[][] totalScore = new int[19][19]; // 이거는 일단 없는거라고 생각하자
 		
 		int[] dummycell= new int[19]; //만약 상대편 돌에 의해 쓰레기 cell 이 나올 때를 대비.
 		int notusertag=0; // usertag 의 반대. 1이면 2, 2이면 1.
 		int first_notusertag = -1; //dummycell을 살펴볼 때 만약 notusertag가 있다면 위치를 기억하기 위한 수
 		int gab_notusertag = 0; 
+		System.out.println("debug-------");
+		for(int i=0; i<arraylength; i++) {
+			System.out.printf("%d ", one_rawData[i]);
+		}
 		
 		if(usertag == 1)
 			notusertag = 2;
