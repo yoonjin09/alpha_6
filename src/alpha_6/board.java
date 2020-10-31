@@ -34,6 +34,15 @@ public class board {
 		else return true;
 	}
 	
+	public boolean isValidInput(cor move1) { //return false for invalid, return true for valid input
+		int x1=move1.getX();
+		int y1=move1.getY();
+		if(x1<0||y1<0) return false;
+		else if(x1>18||y1>18) return false;
+		else if(this.board[x1][y1]!=0) return false;
+		else return true;
+	}
+	
 	public boolean isFull() { // return false for not full, true for full board
 		for(int i =0; i< 19; i++) {
 			for(int j=0; j<19; j++) {
@@ -44,9 +53,9 @@ public class board {
 	}
 	
 	public void printBoard() {
-		System.out.println("x\\y\t1 2 3 4 5 6 7 8 9 a 1 2 3 4 5 6 7 8 9\n");
+		System.out.println("x\\y\t0 1 2 3 4 5 6 7 8 9 a 1 2 3 4 5 6 7 8\n");
 		for(int i =0; i< 19; i++) {
-			System.out.printf("%d\t", i+1);
+			System.out.printf("%d\t", i);
 			for(int j=0; j<19; j++) {
 				System.out.printf("%d ", this.board[i][j]);
 			}
@@ -58,6 +67,10 @@ public class board {
 		this.board[move1.getX()][move1.getY()]=this.userTag;
 		this.board[move2.getX()][move2.getY()]=this.userTag;
 		toggleUserTag();		
+	}
+	
+	public void enterInput(cor move1, int inputUserTag) {
+		this.board[move1.getX()][move1.getY()]=inputUserTag;
 	}
 	
 	public void toggleUserTag() { //userTag only switches between 1 and 2
@@ -77,11 +90,11 @@ public class board {
 				
 		do { //checker for invalid input
 			if(checker) System.out.println("wrong input! plz retry!");
-			System.out.println("input syntax: x1 y1 x2 y2!!");
-			x1=this.n.nextInt()-1;
-			y1=this.n.nextInt()-1;
-			x2=this.n.nextInt()-1;
-			y2=this.n.nextInt()-1;
+			System.out.println("input syntax: x1 y1 x2 y2!! 0~18");
+			x1=this.n.nextInt();
+			y1=this.n.nextInt();
+			x2=this.n.nextInt();
+			y2=this.n.nextInt();
 			this.n.nextLine();
 			move1=new cor(x1, y1);
 			move2=new cor(x2, y2);
@@ -95,7 +108,31 @@ public class board {
 		return true;
 	}
 	
+	public void setGame() {
+		int numOfRed;
+		System.out.print("plz input the number of the red stone: ");
+		numOfRed=this.n.nextInt();
+		this.n.nextLine();
+		if(numOfRed==0) return;
+		System.out.print("plz input the cordinates (syntax: x1 y1 x2 y2...): ");
+		cor []moves=new cor[numOfRed];
+		int x=0, y=0;
+		for(int i=0; i<numOfRed; i++) {
+			x=this.n.nextInt();
+			y=this.n.nextInt();
+			moves[i]=new cor(x, y);
+			if(isValidInput(moves[i]))
+				enterInput(moves[i], 3);
+			else {
+				System.out.println("error!");
+			}
+		}
+		
+	}
+	
 	public void runGame() {
+		setGame();
+		printBoard();
 		do {
 			getInput();
 			printBoard();

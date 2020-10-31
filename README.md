@@ -1,6 +1,5 @@
 # alpha_6
 
-오윤진입니다
 실행순서:
   인풋을 받는다
   올바르게 입력 되었는지 확인하고 보드에 착수한다.
@@ -56,3 +55,9 @@ evaluation process:
       place the stone where can stop opponent's build and link ally's stones
 
 the input syntax for the program is x1 y1 x2 y2.
+
+todo:
+  unify 1~19 and 0~18
+  option: ctrl+z
+  dealing with wrong input: receive new input or continue without wrong input
+  option: input 0~5 red stones which blocks the space only

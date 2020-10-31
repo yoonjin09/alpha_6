@@ -4,27 +4,18 @@ public class evaluate { //
 		//board scoreForBlack, scoreForwhite;
 		static int [][]totalScore= new int[19][19];
 		static cor move= new cor();
+		static int LEFTRIGHT =0, TOPDOWN=1, TOPLBOTR =2, BOTLTOPR=3;
 	/*
-	 * read board left to right, top to bottom, left top to right bottom, 
-	 * right top to left bottom, if there is a stone, hand read direction, cor, board, usertag to evaGIveScore()
+	 * read board left to right, top to bottom, left top to right bottom, left bottom to right top
+	 * if there is a stone, hand direction, cor of the beginning of the row, 
+	 * copied data of the row, usertag to evaGIveScore()
+	 * all direction start from (0,0) except left bottom to right top which starts from (18,0)
+	 * (0,0) being left top corner; (18,0) being left bottom
 	*/
 
 	public static void readBoWDir(int[][] rawData, int userTag) {
 		int k=0;
 		int[] oneRow=new int[19];
-		for(int i =0; i<19; i++) { //top down 
-			for(int j=0; j<19; j++) {
-				if(rawData[i][j]!=0&&rawData[i][j]!=3) {
-					move.x=i;
-					move.y=0;
-					for(j=0; j<19; j++) {
-						oneRow[j]=rawData[i][j];
-					}
-					evaGiveScoreC1(oneRow, 19, userTag, move.x, move.y, 1);
-					break;
-				}
-			}
-		}
 		
 		for(int i=0; i<19; i++) { //left right
 			for(int j=0; j<19; j++) {
@@ -34,7 +25,21 @@ public class evaluate { //
 					for(j=0; j<19; j++) {
 						oneRow[j]=rawData[j][i];
 					}
-					evaGiveScoreC1(oneRow, 19, userTag, move.x, move.y, 0);
+					evaGiveScoreC1(oneRow, 19, userTag, move, LEFTRIGHT);
+					break;
+				}
+			}
+		}
+		
+		for(int i =0; i<19; i++) { //top down 
+			for(int j=0; j<19; j++) {
+				if(rawData[i][j]!=0&&rawData[i][j]!=3) {
+					move.x=i;
+					move.y=0;
+					for(j=0; j<19; j++) {
+						oneRow[j]=rawData[i][j];
+					}
+					evaGiveScoreC1(oneRow, 19, userTag, move, TOPDOWN);
 					break;
 				}
 			}
@@ -51,7 +56,7 @@ public class evaluate { //
 						oneRow[j]=rawData[k][j];
 						k++;
 					}
-					evaGiveScoreC1(oneRow, 19-i, userTag, move.x, move.y, 2);
+					evaGiveScoreC1(oneRow, 19-i, userTag, move, TOPLBOTR);
 					break;
 				}
 				k++;
@@ -68,7 +73,7 @@ public class evaluate { //
 						oneRow[k]=rawData[k][j];
 						k++;
 					}
-					evaGiveScoreC1(oneRow, k, userTag, move.x, move.y, 2);
+					evaGiveScoreC1(oneRow, k, userTag, move, TOPLBOTR);
 					break;
 				}
 				k++;
@@ -86,7 +91,7 @@ public class evaluate { //
 						oneRow[j]=rawData[k][j];
 						k--;
 					}
-					evaGiveScoreC1(oneRow, i+1, userTag, move.x, move.y, 3);
+					evaGiveScoreC1(oneRow, i+1, userTag, move, BOTLTOPR);
 					break;
 				}
 				k--;	
@@ -105,7 +110,7 @@ public class evaluate { //
 						k--;
 						pos++;
 					}
-					evaGiveScoreC1(oneRow, 18-i, userTag, move.x, move.y, 3);
+					evaGiveScoreC1(oneRow, 18-i, userTag, move, BOTLTOPR);
 					break;
 				}
 				k--;
@@ -127,24 +132,27 @@ public class evaluate { //
 	 * one_rawData[] 는 array 값
 	 */
 	 
-	public static void evaGiveScoreC1(int one_rawData[], int arraylength, int usertag, int start_index_x, int start_index_y,  int direction) { 
+	public static void evaGiveScoreC1(int one_rawData[], int arraylength, int usertag, cor move,  int direction) { 
 		//int[][] totalScore = new int[19][19]; // 이거는 일단 없는거라고 생각하자
 		
 		int[] dummycell= new int[19]; //만약 상대편 돌에 의해 쓰레기 cell 이 나올 때를 대비.
 		int notusertag=0; // usertag 의 반대. 1이면 2, 2이면 1.
 		int first_notusertag = -1; //dummycell을 살펴볼 때 만약 notusertag가 있다면 위치를 기억하기 위한 수
 		int gab_notusertag = 0; 
+		
 		System.out.println("debug-------");
+		System.out.println("dir: " +direction + " | pos x: "+move.x+" | pos y: "+ move.y);
 		for(int i=0; i<arraylength; i++) {
 			System.out.printf("%d ", one_rawData[i]);
 		}
+		System.out.println();
 		
 		if(usertag == 1)
 			notusertag = 2;
 		else if(usertag == 2)
 			notusertag = 1;
 		else
-			System.out.println("Usertag is something wrong in evaGiveScoreC1");
+			System.out.println("Usertag bug in evaGiveScoreC1");
 		
 		for(int i=0; i<arraylength ; i++) { //받아온 데이터를 dummycell 로 옮긴다.
 			dummycell[i] = one_rawData[i];
@@ -183,12 +191,12 @@ public class evaluate { //
 		int count_usertag=0;
 		for(int i=0; i< arraylength-5; i++) {
 			//6개의 범위 안에 usertag가 얼마나 있는지 확인
-			for(int j=i; j<i+6; j++) {			
+			for(int j=i; j<i+6; j++) {
 				if(dummycell[j] == usertag)
 					count_usertag++;
 			}
 			//만약 그 범위에 0, 즉 빈 칸이 있다면 count_usertag 만큼 더해준다. 그게 점수다
-			for(int j=i; j<i+6; j++) {			
+			for(int j=i; j<i+6; j++) {
 				if(dummycell[j] == 0)
 					one_rawScore[j]+=count_usertag;
 			}
@@ -198,32 +206,34 @@ public class evaluate { //
 		//여기 까지가 점수 매기기
 		
 		//방향 순서 ->, 아래 , 오른쪽 아래, 왼쪽 아래
-		int x = start_index_x;
-		int y = start_index_y;
+		//int x = start_index_x;
+		//int y = start_index_y;
 		switch(direction) {
-			case 0: 
+			case 0: //left to right
 				for(int i=0; i<19; i++) {
-					totalScore[x][i] += one_rawScore[i];
+					totalScore[i][move.y] += one_rawData[i];//one_rawScore[i];
 				}
 				break;
 				
-			case 1:
+			case 1: //top down
 				for(int i=0; i< 19; i++) {
-					totalScore[i][y] += one_rawScore[i];
+					totalScore[move.x][i] += one_rawData[i];//one_rawScore[i];
 				}
 				break;
 				
-			case 2:
+			case 2: //TOP L TO BOT R
 				for(int i=0; i< arraylength; i++) {
-					totalScore[x][y] +=one_rawScore[i];
-					x++; y++;
+					totalScore[move.x][move.y] +=one_rawData[i];//one_rawScore[i];
+					move.x++; 
+					move.y++;
 				}
 				break;
 				
-			case 3:
+			case 3: //BOT L TO TOP R
 				for(int i=0; i< arraylength; i++) {
-					totalScore[x][y]+=one_rawScore[i];
-					x--; y--;
+					totalScore[move.x][move.y]+=one_rawData[i];//one_rawScore[i];
+					move.x--; 
+					move.y++;
 				}
 				break;
 				
@@ -231,9 +241,9 @@ public class evaluate { //
 				break;
 		}
 		
-		System.out.println("x\\y\t1 2 3 4 5 6 7 8 9 a 1 2 3 4 5 6 7 8 9\n");
+		System.out.println("x\\y\t0 1 2 3 4 5 6 7 8 9 a 1 2 3 4 5 6 7 8\n");
 		for(int i =0; i< 19; i++) {
-			System.out.printf("%d\t", i+1);
+			System.out.printf("%d\t", i);
 			for(int j=0; j<19; j++) {
 				System.out.printf("%d ", totalScore[i][j]);
 			}
