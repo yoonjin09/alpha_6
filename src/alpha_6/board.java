@@ -4,22 +4,22 @@ import java.util.Scanner;
 
 public class board {
 	int [][]board;
-	int userTag;
+	int userTag, aiTag;
 	Scanner n;
 	public board() {
-		this.board=initializeBoard();
+		this.board=new int[19][19];
+		initializeBoard();
 		userTag=1;
 		n=new Scanner(System.in);
 	}
 	
-	private int[][] initializeBoard(){ //initialize the board and input 0 to all place
-		int[][] tempBoard= new int[19][19];
+	private void initializeBoard(){ //initialize the board and input 0 to all place
+		System.out.println("initializing...");
 		for(int i =0; i< 19; i++) {
 			for(int j=0; j<19; j++) {
-				tempBoard[i][j]=0;
+				this.board[i][j]=0;
 			}
 		}
-		return tempBoard;
 	}
 
 	public boolean isValidInput(cor move1, cor move2) { //return false for invalid, return true for valid input
@@ -110,23 +110,39 @@ public class board {
 	
 	public void setGame() {
 		int numOfRed;
-		System.out.print("plz input the number of the red stone: ");
-		numOfRed=this.n.nextInt();
-		this.n.nextLine();
-		if(numOfRed==0) return;
-		System.out.print("plz input the cordinates (syntax: x1 y1 x2 y2...): ");
-		cor []moves=new cor[numOfRed];
-		int x=0, y=0;
-		for(int i=0; i<numOfRed; i++) {
-			x=this.n.nextInt();
-			y=this.n.nextInt();
-			moves[i]=new cor(x, y);
-			if(isValidInput(moves[i]))
+		
+		do {
+			System.out.print("plz input the color of ai's turn(1 for black, 2for white): ");
+			aiTag=this.n.nextInt();
+			this.n.nextLine();
+		}while(aiTag!=1&&aiTag!=2);
+			
+			
+		boolean invalidInput;
+		do {
+			System.out.print("plz input the number of the red stone: ");
+			numOfRed=this.n.nextInt();
+			this.n.nextLine();
+			if(numOfRed==0) return;
+			
+			System.out.print("plz input the cordinates (syntax: x1 y1 x2 y2...): ");
+			invalidInput=false;
+			cor []moves=new cor[numOfRed];
+			int x=0, y=0;
+			for(int i=0; i<numOfRed; i++) {
+				x=this.n.nextInt();
+				y=this.n.nextInt();
+				moves[i]=new cor(x, y);
+				if(!isValidInput(moves[i])) {
+					System.out.println("error!");
+					initializeBoard();
+					invalidInput=true;
+					break;
+				}
 				enterInput(moves[i], 3);
-			else {
-				System.out.println("error!");
 			}
-		}
+			this.n.nextLine();
+		}while(invalidInput);
 		
 	}
 	
@@ -134,9 +150,13 @@ public class board {
 		setGame();
 		printBoard();
 		do {
+			if(userTag==aiTag) {
+				evaluate.aiTurn(this.board, this.aiTag);
+				printBoard();
+			}
 			getInput();
 			printBoard();
-			evaluate.readBoWDir(this.board, this.userTag);
+			
 		}while(checkWinCondition());
 		n.close();
 	}
