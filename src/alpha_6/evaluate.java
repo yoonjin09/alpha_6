@@ -5,18 +5,13 @@ public class evaluate { //
 	// static int [][]totalScore= new int[19][19];
 	static cor move = new cor();
 	final static int LEFTRIGHT = 0, TOPDOWN = 1, TOPLBOTR = 2, BOTLTOPR = 3;
-	
-	
+
 	/*
 	 * 
 	 */
 
 	public static void aiTurn(int[][] board, int aiTag) {
-		int oppoTag;
-		if (aiTag == 1)
-			oppoTag = 2;
-		else
-			oppoTag = 1;
+		int oppoTag = opponentTag(aiTag);
 		int[][] scoreBoard = new int[19][19];
 		readBoWDir(board, scoreBoard, aiTag);
 		readBoWDir(board, scoreBoard, oppoTag);
@@ -272,8 +267,60 @@ public class evaluate { //
 		}
 	}
 
-	public void evaGiveScoreC2() {
-		return;
+	public static int opponentTag(int userTag) {
+		if (userTag == 1)
+			return 2;
+		else
+			return 1;
+	}
+
+	public static void diagnosis(int[] dummycells, int len, int userTag) {
+		int i = 0, valStart = -1, valEnd = -1, stoStart = -1, frontGap = 0, btwGap=0, count1=0, count2=0;
+		boolean conti=false;
+		int oppoTag = opponentTag(userTag);
+		do {
+			if (dummycells[i] != oppoTag) { 
+				valStart = i;
+				int temp;
+				while ((temp = dummycells[i]) != oppoTag) {
+					if (temp == 0) {
+						if(conti) {
+							btwGap++;
+							for(int j=1; j<3; j++) {
+								if(dummycells[i+j]==userTag) break;
+								btwGap++;
+							}
+							if(btwGap==3) {
+								System.out.println("isolated");
+								//여기서도 iso라고 밝히고 점수를 줘야
+							}
+							else if(btwGap<3) {
+								System.out.println("connected");
+								//frontGap count1 gap count2 --> score
+								i+=btwGap;
+								while(dummycells[i]==userTag) {//i pointing at the space behind the stone after the loop, may be 0 or oppo or 3
+									count2++;
+									i++;
+								}
+								//여기서 frontgap count1 btwgap count2로 점수를 처리하고 btwgap을 frontgap으로, count2을 count1로 돌리면 그게 다음 돌들의 info가 된다. 
+								//그리고 그렇게 해서 frontgap에 점수를 넣을려고 하는데 있으면 안넣고 페스하면 된다. 그게 벽으로막혀있는 게 아니기때문에 점수를 짜게 줄 필요가 없다.  
+							}
+							else 
+								System.out.println("bug2");
+							//check if there is stone within 3 blocks, no then isolated, yes then count them too
+						}
+						frontGap++;
+					} else if (temp == userTag) {
+						if(stoStart==-1) stoStart=i;
+						conti=true;
+						count1++;
+					}else {
+						System.out.println("bug1");
+					}
+					i++;
+				}
+			}
+		} while (i < len);
 	}
 
 }
