@@ -32,12 +32,12 @@ public class evaluate { //
 		for (int i = 0; i < 19; i++) { // left right
 			for (int j = 0; j < 19; j++) {
 				// if(rawData[j][i]!=0&&rawData[j][i]!=3) {
-				if (rawData[j][i] == userTag) {
+				if (rawData[i][j] == userTag) {
 
-					move.x = 0;
-					move.y = i;
+					move.x = i;
+					move.y = 0;
 					for (j = 0; j < 19; j++) {
-						oneRow[j] = rawData[j][i];
+						oneRow[j] = rawData[i][j];
 					}
 					evaGiveScoreC1(scoreBoard, oneRow, 19, userTag, move, LEFTRIGHT);
 					break;
@@ -48,11 +48,11 @@ public class evaluate { //
 		for (int i = 0; i < 19; i++) { // top down
 			for (int j = 0; j < 19; j++) {
 				// if(rawData[i][j]!=0&&rawData[i][j]!=3) {
-				if (rawData[i][j] == userTag) {
-					move.x = i;
-					move.y = 0;
+				if (rawData[j][i] == userTag) {
+					move.x = 0;
+					move.y = i;
 					for (j = 0; j < 19; j++) {
-						oneRow[j] = rawData[i][j];
+						oneRow[j] = rawData[j][i];
 					}
 					evaGiveScoreC1(scoreBoard, oneRow, 19, userTag, move, TOPDOWN);
 					break;
@@ -148,7 +148,7 @@ public class evaluate { //
 	 * 넘어오는 array의 길이 (대각선 때문에) one_rawData[] 는 array 값
 	 */
 
-	public static void evaGiveScoreC1(int[][] scoreBoard, int one_rawData[], int arraylength, int usertag, cor move,
+	public static void evaGiveScoreC1(int[][] scoreBoard, int one_rawData[], int arraylength, int userTag, cor move,
 			int direction) {
 		// int[][] totalScore = new int[19][19]; // 이거는 일단 없는거라고 생각하자
 
@@ -163,13 +163,15 @@ public class evaluate { //
 			System.out.printf("%d ", one_rawData[i]);
 		}
 		System.out.println();
-
-		if (usertag == 1)
+/*
+		if (userTag == 1)
 			notusertag = 2;
-		else if (usertag == 2)
+		else if (userTag == 2)
 			notusertag = 1;
 		else
 			System.out.println("Usertag bug in evaGiveScoreC1");
+*/		
+		notusertag=opponentTag(userTag);
 
 		for (int i = 0; i < arraylength; i++) { // 받아온 데이터를 dummycell 로 옮긴다.
 			dummycell[i] = one_rawData[i];
@@ -202,13 +204,16 @@ public class evaluate { //
 
 		}
 		// 여기까지가 죽은 공간은 모두 notusertag 값으로 채워버리는 것.
+		
+		
+		diagnosis(dummycell, arraylength, userTag);
 
 		int[] one_rawScore = new int[19]; // 점수 저장할 array
 		int count_usertag = 0;
 		for (int i = 0; i < arraylength - 5; i++) {
 			// 6개의 범위 안에 usertag가 얼마나 있는지 확인
 			for (int j = i; j < i + 6; j++) {
-				if (dummycell[j] == usertag)
+				if (dummycell[j] == userTag)
 					count_usertag++;
 			}
 			// 만약 그 범위에 0, 즉 빈 칸이 있다면 count_usertag 만큼 더해준다. 그게 점수다
@@ -227,13 +232,13 @@ public class evaluate { //
 		switch (direction) {
 		case LEFTRIGHT: // left to right
 			for (int i = 0; i < 19; i++) {
-				scoreBoard[i][move.y] += one_rawData[i];// one_rawScore[i];
+				scoreBoard[move.x][i] += one_rawData[i];// one_rawScore[i];
 			}
 			break;
 
 		case TOPDOWN: // top down
 			for (int i = 0; i < 19; i++) {
-				scoreBoard[move.x][i] += one_rawData[i];// one_rawScore[i];
+				scoreBoard[i][move.y] += one_rawData[i];// one_rawScore[i];
 			}
 			break;
 
@@ -276,23 +281,38 @@ public class evaluate { //
 
 	public static void diagnosis(int[] dummycells, int len, int userTag) {
 		int i = 0, valStart = -1, valEnd = -1, stoStart = -1, frontGap = 0, btwGap=0, count1=0, count2=0;
-		boolean conti=false;
+		boolean conti=false, blocked=false;
 		int oppoTag = opponentTag(userTag);
 		do {
 			if (dummycells[i] != oppoTag) { 
 				valStart = i;
 				int temp;
-				while ((temp = dummycells[i]) != oppoTag) {
+				while (i<len&&(temp = dummycells[i]) != oppoTag) {
 					if (temp == 0) {
 						if(conti) {
 							btwGap++;
 							for(int j=1; j<3; j++) {
-								if(dummycells[i+j]==userTag) break;
+								if(i+j>=len) {
+									System.out.println("end of line");
+									break;
+								}
+								else if (dummycells[i+j]==oppoTag) {
+									System.out.println("blocked!");
+									blocked=true;
+									break;
+								}
+								else if(dummycells[i+j]==userTag) break;
 								btwGap++;
 							}
+							System.out.println("btwgap==" +btwGap);
 							if(btwGap==3) {
 								System.out.println("isolated");
 								//여기서도 iso라고 밝히고 점수를 줘야
+								System.out.println("segment2 finish: "+ frontGap +" "+count1);
+							}
+							else if(blocked) {
+								System.out.println("checkd blocked");
+								//blocked 밝히고 btwGap이 뒤에 공간이라고 넘기고 계산 
 							}
 							else if(btwGap<3) {
 								System.out.println("connected");
@@ -302,13 +322,22 @@ public class evaluate { //
 									count2++;
 									i++;
 								}
+								
+								System.out.println("segment finish: "+ frontGap +" "+count1+" "+ btwGap+ " "+count2+" ");
 								//여기서 frontgap count1 btwgap count2로 점수를 처리하고 btwgap을 frontgap으로, count2을 count1로 돌리면 그게 다음 돌들의 info가 된다. 
 								//그리고 그렇게 해서 frontgap에 점수를 넣을려고 하는데 있으면 안넣고 페스하면 된다. 그게 벽으로막혀있는 게 아니기때문에 점수를 짜게 줄 필요가 없다.  
 							}
 							else 
 								System.out.println("bug2");
 							//check if there is stone within 3 blocks, no then isolated, yes then count them too
+							btwGap=0;
+							conti=false;
+							blocked = false;
+							frontGap=0;
+							count1=count2;
+							count2=0;
 						}
+						
 						frontGap++;
 					} else if (temp == userTag) {
 						if(stoStart==-1) stoStart=i;
@@ -320,6 +349,7 @@ public class evaluate { //
 					i++;
 				}
 			}
+			i++;
 		} while (i < len);
 	}
 
