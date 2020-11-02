@@ -6,6 +6,7 @@ public class board {
 	int [][]board;
 	int userTag, aiTag;
 	Scanner n;
+	
 	public board() {
 		this.board=new int[19][19];
 		initializeBoard();
@@ -53,14 +54,15 @@ public class board {
 	}
 	
 	public void printBoard() {
-		System.out.println("x\\y\t0 1 2 3 4 5 6 7 8 9 a 1 2 3 4 5 6 7 8\n");
+		System.out.println("x\\y\t0 1 2 3 4 5 6 7 8 9 a 1 2 3 4 5 6 7 8");
 		for(int i =0; i< 19; i++) {
-			System.out.printf("%d\t", i);
+			System.out.printf("%2d\t", i);
 			for(int j=0; j<19; j++) {
 				System.out.printf("%d ", this.board[i][j]);
 			}
 			System.out.println();
 		}
+		System.out.println();
 	}
 	
 	public void enterInput(cor move1, cor move2) {
@@ -156,7 +158,6 @@ public class board {
 			}
 			getInput();
 			printBoard();
-			
 		}while(checkWinCondition());
 		n.close();
 	}
