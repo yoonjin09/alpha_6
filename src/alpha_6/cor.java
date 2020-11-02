@@ -10,10 +10,19 @@ public class cor {
 		this.x=0;
 		this.y=0;
 	}
-	int getX() {
+	public int getX() {
 		return this.x;
 	}
-	int getY() {
+	public int getY() {
 		return this.y;
 	}
+	public void setX(int x) {
+		this.x=x;
+		return;
+	}
+	public void setY(int y) {
+		this.y=y;
+		return;
+	}
+	
 }

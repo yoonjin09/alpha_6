@@ -7,6 +7,7 @@ public class board {
 	int userTag, aiTag;
 	Scanner n;
 	boolean winchecker;
+
 	public board() {
 		this.board=new int[19][19];
 		initializeBoard();
@@ -55,14 +56,16 @@ public class board {
 	}
 	
 	public void printBoard() {
-		System.out.println("x\\y\t0 1 2 3 4 5 6 7 8 9 a 1 2 3 4 5 6 7 8\n");
+
+		System.out.println("x\\y\t0 1 2 3 4 5 6 7 8 9 a 1 2 3 4 5 6 7 8");
 		for(int i =0; i< 19; i++) {
-			System.out.printf("%d\t", i);
+			System.out.printf("%2d\t", i);
 			for(int j=0; j<19; j++) {
 				System.out.printf("%d ", this.board[i][j]);
 			}
 			System.out.println();
 		}
+		System.out.println();
 	}
 	
 	public void enterInput(cor move1, cor move2) {
@@ -280,6 +283,44 @@ public class board {
 		
 	}
 	
+	public void setGame() {
+		int numOfRed;
+		
+		do {
+			System.out.print("plz input the color of ai's turn(1 for black, 2for white): ");
+			aiTag=this.n.nextInt();
+			this.n.nextLine();
+		}while(aiTag!=1&&aiTag!=2);
+			
+			
+		boolean invalidInput;
+		do {
+			System.out.print("plz input the number of the red stone: ");
+			numOfRed=this.n.nextInt();
+			this.n.nextLine();
+			if(numOfRed==0) return;
+			
+			System.out.print("plz input the cordinates (syntax: x1 y1 x2 y2...): ");
+			invalidInput=false;
+			cor []moves=new cor[numOfRed];
+			int x=0, y=0;
+			for(int i=0; i<numOfRed; i++) {
+				x=this.n.nextInt();
+				y=this.n.nextInt();
+				moves[i]=new cor(x, y);
+				if(!isValidInput(moves[i])) {
+					System.out.println("error!");
+					initializeBoard();
+					invalidInput=true;
+					break;
+				}
+				enterInput(moves[i], 3);
+			}
+			this.n.nextLine();
+		}while(invalidInput);
+		
+	}
+	
 	public void runGame() {
 		setGame();
 		printBoard();
@@ -290,7 +331,6 @@ public class board {
 			}
 			getInput();
 			printBoard();
-			
 		}while(!winchecker);
 		System.out.println(userTag + " Defeat.....!");
 		n.close();
