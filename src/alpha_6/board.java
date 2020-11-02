@@ -283,44 +283,6 @@ public class board {
 		
 	}
 	
-	public void setGame() {
-		int numOfRed;
-		
-		do {
-			System.out.print("plz input the color of ai's turn(1 for black, 2for white): ");
-			aiTag=this.n.nextInt();
-			this.n.nextLine();
-		}while(aiTag!=1&&aiTag!=2);
-			
-			
-		boolean invalidInput;
-		do {
-			System.out.print("plz input the number of the red stone: ");
-			numOfRed=this.n.nextInt();
-			this.n.nextLine();
-			if(numOfRed==0) return;
-			
-			System.out.print("plz input the cordinates (syntax: x1 y1 x2 y2...): ");
-			invalidInput=false;
-			cor []moves=new cor[numOfRed];
-			int x=0, y=0;
-			for(int i=0; i<numOfRed; i++) {
-				x=this.n.nextInt();
-				y=this.n.nextInt();
-				moves[i]=new cor(x, y);
-				if(!isValidInput(moves[i])) {
-					System.out.println("error!");
-					initializeBoard();
-					invalidInput=true;
-					break;
-				}
-				enterInput(moves[i], 3);
-			}
-			this.n.nextLine();
-		}while(invalidInput);
-		
-	}
-	
 	public void runGame() {
 		setGame();
 		printBoard();
