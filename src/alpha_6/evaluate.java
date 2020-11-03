@@ -201,7 +201,7 @@ public class evaluate { //
 		} // end convert dead
 
 		/*
-		 * segment usertag,, diagnosis
+		 * segment usertag,, diagnosis--------------------------------------------------------------
 		 */
 		System.out.print("dummies:");
 		for (int k = 0; k < onerawdatalen; k++) {
@@ -294,6 +294,8 @@ public class evaluate { //
 			}
 			pos++;
 		} // while loop end
+		
+		
 
 		switch (direction) {
 		case LEFTRIGHT: // left to right
@@ -328,11 +330,11 @@ public class evaluate { //
 			break;
 		}// end of switch
 
-		System.out.println("||x\\y\t0 1 2 3 4 5 6 7 8 9 a 1 2 3 4 5 6 7 8");
+		System.out.println("||x\\y\t   0    1    2    3    4    5    6    7    8    9    a    1    2    3    4    5    6    7    8");
 		for (int i = 0; i < 19; i++) {
 			System.out.printf("||%d\t", i);
 			for (int j = 0; j < 19; j++) {
-				System.out.printf("%d ", scoreBoard[i][j]);
+				System.out.printf("%4d ", scoreBoard[i][j]);
 			}
 			System.out.println();
 		}
@@ -432,7 +434,7 @@ public class evaluate { //
 
 	public static void giveScore(int[] one_rawData, int frontGap, int count1, int btwGap, int count2, int pos,
 			boolean blocked, int runNumber, int offOrDef) {
-		int scoreArrayAdd = 0;
+		int scoreArrayAdd = 0, temp = 0;
 		if (runNumber == 1 && offOrDef == OFFENSE)
 			scoreArrayAdd = 0;
 		else if (runNumber == 1 && offOrDef == DEFENSE)
@@ -441,33 +443,72 @@ public class evaluate { //
 			scoreArrayAdd = 10;
 		else if (runNumber == 2 && offOrDef == DEFENSE)
 			scoreArrayAdd = 15;
-
-		if (frontGap > 3) {
+		/*
+		 * doing front calc
+		 */
+		if (frontGap > 4) {
 			frontGap = 4;
 		}
 		pos -= frontGap;
+		System.out.println("--debug--givascore frontgap: " + scoreArrayAdd +" "+ count1);
 		for (int i = 0; i < frontGap; i++) {
-			System.out.println("--debug--givascore frontgap: "+scoreArrayAdd+count1);
-			one_rawData[pos + i] = scoresArray[scoreArrayAdd + count1][i];
+			temp = scoresArray[scoreArrayAdd + count1 - 1][i];
+			if(btwGap<3&&blocked) {
+				temp/=4.5;
+			}
+			if (one_rawData[pos + i] < temp) {
+				one_rawData[pos + i] = temp;// scoresArray[scoreArrayAdd + count1 -1][i];
+			}
 		}
 		pos += frontGap + count1;
-		if (count2 == 0) {// case isolated
+		/*
+		 * doing back calc, pos at the start of bwtgap
+		 */
+		if(blocked) {
+			int j=0;
+			for(int i=btwGap-1; i>=0; i--) {
+				temp=scoresArray[scoreArrayAdd + count1 - 1][j];
+				if(frontGap<3) temp/=4.5;
+				one_rawData[pos + i] = temp;
+				j++;
+			}
+		}
+		else if (count2 == 0) {// case isolated
 			int j = 0;
-			for (int i = btwGap; i > 0; i--) {
-				System.out.println("--debug--givascore btwgap 1: "+scoreArrayAdd+count1);
-				one_rawData[pos + j] = scoresArray[scoreArrayAdd + count1][i];
+			System.out.println("--debug--givascore btwgap 1: " + scoreArrayAdd + " " + count1);
+			for (int i = btwGap-1; i >= 0; i--) {
+				temp=scoresArray[scoreArrayAdd + count1 - 1][i];
+				if(frontGap<3) temp/=4.5;
+				one_rawData[pos + j] = temp;
 				j++;
 			}
 			return;
-		} else if (count2 != 0) {
-			if(runNumber==1&&btwGap<=2) {
-				
+		} else if (count2 != 0) {//if not isolated
+			if (offOrDef==DEFENSE||runNumber == 1 && btwGap <= 2) { // run1 with gap 2, consider them as one, for defense no need to differentiate
+				count1 += count2;
+				for (int i = 0; i < btwGap; i++) {
+					temp=scoresArray[scoreArrayAdd + count1 - 1][3];
+					if(frontGap<3) temp/=4.5;
+					one_rawData[pos + i] = temp;
+				}
+			} else if (runNumber == 2 && btwGap == 1) { // for run2 only consider 2 pile of stones with 1gap as one
+				count1 += count2;
+				for (int i = 0; i < btwGap; i++) {
+					temp=scoresArray[scoreArrayAdd + count1 - 1][3];
+					if(frontGap<3) temp/=4.5;
+					one_rawData[pos + i] = temp;
+				}
+			} else {//else just consider them as individuals
+				int j = 0;
+				for (int i = 3; i > 3 - btwGap; i--) {
+					temp=scoresArray[scoreArrayAdd + count1 - 1][i];
+					if(frontGap<3) temp/=4.5;
+					one_rawData[pos + j] = temp;
+					j++;
+				}
 			}
-			else if( runNumber==2&&btwGap==1) {
-				
-			}
-
 		}
+		/*
 		if (frontGap == 0) {
 			System.out.println("front is blocked directly");
 		} else if (frontGap < 4) {
@@ -478,7 +519,8 @@ public class evaluate { //
 		} else if (blocked) {
 			System.out.println("end is blocked indirectly with gap: " + btwGap);
 		}
+		*/
 	}
 }
-
+//막힌게 2칸 떨어져있으면 반대편 /4.5 3칸 떨어져있으면 그대
 //앞에 들어가는 점수들은 돌들에만 의존하지 말고 뒤의 갭과 앞의 돌들을 같이 고려하면 훨씬 좋을

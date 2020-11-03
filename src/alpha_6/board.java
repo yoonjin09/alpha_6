@@ -287,10 +287,11 @@ public class board {
 		setGame();
 		printBoard();
 		do {
-			if(userTag==aiTag) {
+			//if(userTag==aiTag) {
 				evaluate.aiTurn(this.board, this.aiTag);
+			//	printBoard();
+			//}
 				printBoard();
-			}
 			getInput();
 			printBoard();
 		}while(!winchecker);
