@@ -4,14 +4,19 @@ public class evaluate { //
 	// board scoreForBlack, scoreForwhite;
 	// static int [][]totalScore= new int[19][19];
 	static cor move = new cor();
-	final static int LEFTRIGHT = 0, TOPDOWN = 1, TOPLBOTR = 2, BOTLTOPR = 3;
+	final static int LEFTRIGHT = 0, TOPDOWN = 1, TOPLBOTR = 2, BOTLTOPR = 3, OFFENSE = 1, DEFENSE = 2;
+	final static int[][] scoresArray = { { 5, 10, 20, 35 }, { 15, 20, 30, 45 }, { 10, 15, 25, 40 }, { 0, 0, 0, 1000 },
+			{ 0, 0, 0, 1000 }, { 0, 0, 5, 20 }, { 0, 5, 15, 30 }, { 10, 15, 25, 40 }, { 0, 0, 120, 200, },
+			{ 0, 0, 0, 200 }, { 0, 0, 80, 200 }, { 5, 10, 20, 35 }, { 0, 5, 15, 30 }, { 10, 15, 25, 40 },
+			{ 0, 0, 0, 2000 }, { 0, 0, 10, 25 }, { 15, 20, 30, 45 }, { 0, 5, 15, 30 }, { 0, 0, 0, 1000 },
+			{ 0, 0, 0, 1000 } };
 
 	public static void aiTurn(int[][] board, int aiTag) {
 		System.out.println("----aiturn with tag: " + aiTag);
 		int oppoTag = opponentTag(aiTag);
 		int[][] scoreBoard = new int[19][19];
-		readBoWDir(board, scoreBoard, aiTag);
-		readBoWDir(board, scoreBoard, oppoTag);
+		readBoWDir(board, scoreBoard, aiTag, 1, OFFENSE);
+		readBoWDir(board, scoreBoard, oppoTag, 1, DEFENSE);
 		// find location with highest point
 		// enter input
 		
@@ -51,7 +56,7 @@ public class evaluate { //
 	 * (0,0) being left top corner; (18,0) being left bottom
 	 */
 
-	public static void readBoWDir(int[][] rawData, int[][] scoreBoard, int userTag) {
+	public static void readBoWDir(int[][] rawData, int[][] scoreBoard, int userTag, int runNumber, int offOrDef) {
 		int k = 0;
 		int[] oneRow = new int[19];
 
@@ -64,7 +69,7 @@ public class evaluate { //
 					for (j = 0; j < 19; j++) {
 						oneRow[j] = rawData[i][j];
 					}
-					evaGiveScoreC1(scoreBoard, oneRow, 19, userTag, move, LEFTRIGHT);
+					evaGiveScoreC1(scoreBoard, oneRow, 19, userTag, move, LEFTRIGHT, runNumber, offOrDef);
 					break;
 				}
 			}
@@ -79,7 +84,7 @@ public class evaluate { //
 					for (j = 0; j < 19; j++) {
 						oneRow[j] = rawData[j][i];
 					}
-					evaGiveScoreC1(scoreBoard, oneRow, 19, userTag, move, TOPDOWN);
+					evaGiveScoreC1(scoreBoard, oneRow, 19, userTag, move, TOPDOWN, runNumber, offOrDef);
 					break;
 				}
 			}
@@ -97,7 +102,7 @@ public class evaluate { //
 						oneRow[j] = rawData[k][j];
 						k++;
 					}
-					evaGiveScoreC1(scoreBoard, oneRow, 19 - i, userTag, move, TOPLBOTR);
+					evaGiveScoreC1(scoreBoard, oneRow, 19 - i, userTag, move, TOPLBOTR, runNumber, offOrDef);
 					break;
 				}
 				k++;
@@ -115,7 +120,7 @@ public class evaluate { //
 						oneRow[k] = rawData[k][j];
 						k++;
 					}
-					evaGiveScoreC1(scoreBoard, oneRow, k, userTag, move, TOPLBOTR);
+					evaGiveScoreC1(scoreBoard, oneRow, k, userTag, move, TOPLBOTR, runNumber, offOrDef);
 					break;
 				}
 				k++;
@@ -134,7 +139,7 @@ public class evaluate { //
 						oneRow[j] = rawData[k][j];
 						k--;
 					}
-					evaGiveScoreC1(scoreBoard, oneRow, i + 1, userTag, move, BOTLTOPR);
+					evaGiveScoreC1(scoreBoard, oneRow, i + 1, userTag, move, BOTLTOPR, runNumber, offOrDef);
 					break;
 				}
 				k--;
@@ -154,7 +159,7 @@ public class evaluate { //
 						k--;
 						pos++;
 					}
-					evaGiveScoreC1(scoreBoard, oneRow, 18 - i, userTag, move, BOTLTOPR);
+					evaGiveScoreC1(scoreBoard, oneRow, 18 - i, userTag, move, BOTLTOPR, runNumber, offOrDef);
 					break;
 				}
 				k--;
@@ -169,30 +174,34 @@ public class evaluate { //
 	 * 
 	 */
 	/*
-	 * start_index_x,y 시작하는 좌표 direction 방 userTag_confirm 흑인지 백인지 확인 onerawdatalen 는
-	 * 넘어오는 array의 길이 (대각선 때문에) one_rawData[] 는 array 값
+	 * start_index_x,y 시작하는 좌표 direction 방 userTag_confirm 흑인지 백인지 확인 onerawdatalen
+	 * 는 넘어오는 array의 길이 (대각선 때문에) one_rawData[] 는 array 값
 	 */
 
-	public static void evaGiveScoreC1(int[][] scoreBoard, int one_rawData[], int onerawdatalen, int userTag, cor move,
-			int direction) {
-		int[] dummycell = new int[19]; // 만약 상대편 돌에 의해 쓰레기 cell 이 나올 때를 대비.
-		int first_notusertag = -1; // dummycell을 살펴볼 때 만약 notusertag가 있다면 위치를 기억하기 위한 수
-		int gab_notusertag = 0;
+	public static void evaGiveScoreC1(int[][] scoreBoard, int dummycell[], int onerawdatalen, int userTag, cor move,
+			int direction, int runNumber, int offOrDef) {
+		// int[] dummycell = new int[onerawdatalen]; // 만약 상대편 돌에 의해 쓰레기 cell 이 나올 때를
+		// 대비.
+		int[] one_rawData = new int[onerawdatalen];
+		int first_notusertag = -1, gab_notusertag = 0; // dummycell을 살펴볼 때 만약 notusertag가 있다면 위치를 기억하기 위한 수
 		int oppoTag = opponentTag(userTag);
+		int pos = 0, stoStart = -1, frontGap = 0, btwGap = 0, count1 = 0, count2 = 0, count2Start = -1;
+		boolean conti = false, blocked = false;
 
 		System.out.println("debug------- for : " + userTag);
 		System.out.println("dir: " + direction + " | pos x: " + move.x + " | pos y: " + move.y);
 		for (int i = 0; i < onerawdatalen; i++) {
-			System.out.printf("%d ", one_rawData[i]);
+			System.out.printf("%d ", dummycell[i]);
 		}
 		System.out.println();
-		
+
 		/*
 		 * convert dead area to oppotag
 		 */
-		for (int i = 0; i < onerawdatalen; i++) { // 받아온 데이터를 dummycell 로 옮긴다.
-			dummycell[i] = one_rawData[i];
-		}
+		/*
+		 * for (int i = 0; i < onerawdatalen; i++) { // 받아온 데이터를 dummycell 로 옮긴다.
+		 * dummycell[i] = one_rawData[i]; }
+		 */
 		for (int i = 0; i < onerawdatalen; i++) {
 			if (dummycell[i] == 3)
 				dummycell[i] = oppoTag;
@@ -203,7 +212,6 @@ public class evaluate { //
 				} else {
 					gab_notusertag = i - first_notusertag - 1; // 두번째 notusertag가 나왔다면 두 index의 차이에 -1 이다.
 				}
-
 				if (gab_notusertag < 6) { // 만약 차이가 5이하이면 어차피 죽은 공간, 따라서 검은 돌만 있다고 생각한다.
 					for (int j = first_notusertag; j < i; j++) {
 						dummycell[j] = oppoTag;
@@ -218,31 +226,33 @@ public class evaluate { //
 					}
 				}
 			}
+		} // end convert dead
 
-		}
 		/*
-		 * segment usertag
+		 * segment usertag,, diagnosis--------------------------------------------------------------
 		 */
-		int pos = 0, stoStart = -1, frontGap = 0, btwGap = 0, count1 = 0, count2 = 0;
-		boolean conti = false, blocked = false;
-
 		System.out.print("dummies:");
 		for (int k = 0; k < onerawdatalen; k++) {
 			System.out.print(dummycell[k] + " ");
 		}
 		System.out.println();
+		// 만약에 아군 돌들 사이에 장애물이 없다면 시작과 끝은 데려와서 1-1-11의 케이스를 확인할 수 있도록
+
 		while (pos < onerawdatalen) {
 			int temp;
 			if ((temp = dummycell[pos]) == oppoTag) {
 				if (conti) {
 					System.out.println("blocked directly " + frontGap + " " + count1 + " " + btwGap);
 					blocked = true;
-					giveScore(); // blocked btwgap count1 frontgap
+					giveScore(one_rawData, frontGap, count1, btwGap, count2, stoStart, blocked, runNumber, offOrDef); // blocked
+																														// btwgap
+					// count1 frontgap
 
 					conti = false;
 					blocked = false;
 					frontGap = 0;
 					count1 = 0;
+					stoStart = -1;
 				}
 				frontGap = 0;
 			} else if (temp == 0) {
@@ -263,23 +273,28 @@ public class evaluate { //
 					System.out.println("btwgap==" + btwGap);
 					if (btwGap == 4) {
 						System.out.println("case isolated " + frontGap + " " + count1);
-						giveScore();
+						giveScore(one_rawData, frontGap, count1, btwGap, count2, stoStart, blocked, runNumber,
+								offOrDef);
 						// 여기서도 iso라고 밝히고 점수를 줘야
 					} else if (blocked) {
 						System.out.println("case blocked " + frontGap + " " + count1 + " " + btwGap);
-						giveScore();
+						giveScore(one_rawData, frontGap, count1, btwGap, count2, stoStart, blocked, runNumber,
+								offOrDef);
 						// blocked 밝히고 btwGap이 뒤에 공간이라고 넘기고 계산
 					} else if (btwGap < 4) {
 						// frontGap count1 gap count2 --> score
 						pos += btwGap;
+						count2Start = pos;
 						while (dummycell[pos] == userTag) {// i pointing at the space behind the stone after the loop,
 															// may be 0 or oppo or 3
 							count2++;
 							pos++;
 						}
+						pos--;
 						System.out.println(
 								"case connected " + frontGap + " " + count1 + " " + btwGap + " " + count2 + " ");
-						giveScore();
+						giveScore(one_rawData, frontGap, count1, btwGap, count2, stoStart, blocked, runNumber,
+								offOrDef);
 						// 여기서 frontgap count1 btwgap count2로 점수를 처리하고 btwgap을 frontgap으로, count2을
 						// count1로 돌리면 그게 다음 돌들의 info가 된다.
 						// 그리고 그렇게 해서 frontgap에 점수를 넣을려고 하는데 있으면 안넣고 페스하면 된다. 그게 벽으로막혀있는 게 아니기때문에 점수를 짜게
@@ -288,14 +303,17 @@ public class evaluate { //
 						System.out.println("bug2");
 					// check if there is stone within 3 blocks, no then isolated, yes then count
 					// them too
+					if (btwGap == 4 || blocked)
+						conti = false;
 					btwGap = 0;
-					conti = false;
 					blocked = false;
 					frontGap = 0;
 					count1 = count2;
 					count2 = 0;
+					stoStart = count2Start;
+				} else {
+					frontGap++;
 				}
-				frontGap++;
 			} else if (temp == userTag) {
 				if (stoStart == -1)
 					stoStart = pos;
@@ -304,20 +322,9 @@ public class evaluate { //
 			}
 			pos++;
 		} // while loop end
+		
+		
 
-		/*
-		 * int[] one_rawScore = new int[19]; // 점수 저장할 array int count_usertag = 0; for
-		 * (int i = 0; i < arraylength - 5; i++) { // 6개의 범위 안에 usertag가 얼마나 있는지 확인 for
-		 * (int j = i; j < i + 6; j++) { if (dummycell[j] == userTag) count_usertag++; }
-		 * // 만약 그 범위에 0, 즉 빈 칸이 있다면 count_usertag 만큼 더해준다. 그게 점수다 for (int j = i; j < i
-		 * + 6; j++) { if (dummycell[j] == 0) one_rawScore[j] += count_usertag; }
-		 * count_usertag = 0; }
-		 */
-		// 여기 까지가 점수 매기기
-
-		// 방향 순서 ->, 아래 , 오른쪽 아래, 왼쪽 아래
-		// int x = start_index_x;
-		// int y = start_index_y;
 		switch (direction) {
 		case LEFTRIGHT: // left to right
 			for (int i = 0; i < 19; i++) {
@@ -349,13 +356,13 @@ public class evaluate { //
 
 		default:
 			break;
-		}
+		}// end of switch
 
-		System.out.println("||x\\y\t0 1 2 3 4 5 6 7 8 9 a 1 2 3 4 5 6 7 8");
+		System.out.println("||x\\y\t   0    1    2    3    4    5    6    7    8    9    a    1    2    3    4    5    6    7    8");
 		for (int i = 0; i < 19; i++) {
 			System.out.printf("||%d\t", i);
 			for (int j = 0; j < 19; j++) {
-				System.out.printf("%d ", scoreBoard[i][j]);
+				System.out.printf("%4d ", scoreBoard[i][j]);
 			}
 			System.out.println();
 		}
@@ -384,7 +391,7 @@ public class evaluate { //
 				if (conti) {
 					System.out.println("blocked directly " + frontGap + " " + count1 + " " + btwGap);
 					blocked = true;
-					giveScore(); // blocked btwgap count1 frontgap
+					// giveScore(); // blocked btwgap count1 frontgap
 
 					conti = false;
 					blocked = false;
@@ -410,11 +417,11 @@ public class evaluate { //
 					System.out.println("btwgap==" + btwGap);
 					if (btwGap == 4) {
 						System.out.println("case isolated " + frontGap + " " + count1);
-						giveScore();
+						// giveScore();
 						// 여기서도 iso라고 밝히고 점수를 줘야
 					} else if (blocked) {
 						System.out.println("case blocked " + frontGap + " " + count1 + " " + btwGap);
-						giveScore();
+						// giveScore();
 						// blocked 밝히고 btwGap이 뒤에 공간이라고 넘기고 계산
 					} else if (btwGap < 4) {
 						// frontGap count1 gap count2 --> score
@@ -426,7 +433,7 @@ public class evaluate { //
 						}
 						System.out.println(
 								"case connected " + frontGap + " " + count1 + " " + btwGap + " " + count2 + " ");
-						giveScore();
+						// giveScore();
 						// 여기서 frontgap count1 btwgap count2로 점수를 처리하고 btwgap을 frontgap으로, count2을
 						// count1로 돌리면 그게 다음 돌들의 info가 된다.
 						// 그리고 그렇게 해서 frontgap에 점수를 넣을려고 하는데 있으면 안넣고 페스하면 된다. 그게 벽으로막혀있는 게 아니기때문에 점수를 짜게
@@ -453,7 +460,97 @@ public class evaluate { //
 		} // while loop end
 	}
 
-	public static void giveScore() {
-
+	public static void giveScore(int[] one_rawData, int frontGap, int count1, int btwGap, int count2, int pos,
+			boolean blocked, int runNumber, int offOrDef) {
+		int scoreArrayAdd = 0, temp = 0;
+		if (runNumber == 1 && offOrDef == OFFENSE)
+			scoreArrayAdd = 0;
+		else if (runNumber == 1 && offOrDef == DEFENSE)
+			scoreArrayAdd = 5;
+		else if (runNumber == 2 && offOrDef == OFFENSE)
+			scoreArrayAdd = 10;
+		else if (runNumber == 2 && offOrDef == DEFENSE)
+			scoreArrayAdd = 15;
+		/*
+		 * doing front calc
+		 */
+		if (frontGap > 4) {
+			frontGap = 4;
+		}
+		pos -= frontGap;
+		System.out.println("--debug--givascore frontgap: " + scoreArrayAdd +" "+ count1);
+		for (int i = 0; i < frontGap; i++) {
+			temp = scoresArray[scoreArrayAdd + count1 - 1][i];
+			if(btwGap<3&&blocked) {
+				temp/=4.5;
+			}
+			if (one_rawData[pos + i] < temp) {
+				one_rawData[pos + i] = temp;// scoresArray[scoreArrayAdd + count1 -1][i];
+			}
+		}
+		pos += frontGap + count1;
+		/*
+		 * doing back calc, pos at the start of bwtgap
+		 */
+		if(blocked) {
+			int j=0;
+			for(int i=btwGap-1; i>=0; i--) {
+				temp=scoresArray[scoreArrayAdd + count1 - 1][j];
+				if(frontGap<3) temp/=4.5;
+				one_rawData[pos + i] = temp;
+				j++;
+			}
+		}
+		else if (count2 == 0) {// case isolated
+			int j = 0;
+			System.out.println("--debug--givascore btwgap 1: " + scoreArrayAdd + " " + count1);
+			for (int i = btwGap-1; i >= 0; i--) {
+				temp=scoresArray[scoreArrayAdd + count1 - 1][i];
+				if(frontGap<3) temp/=4.5;
+				one_rawData[pos + j] = temp;
+				j++;
+			}
+			return;
+		} else if (count2 != 0) {//if not isolated
+			if (offOrDef==DEFENSE||runNumber == 1 && btwGap <= 2) { // run1 with gap 2, consider them as one, for defense no need to differentiate
+				count1 += count2;
+				for (int i = 0; i < btwGap; i++) {
+					temp=scoresArray[scoreArrayAdd + count1 - 1][3];
+					if(frontGap<3) temp/=4.5;
+					one_rawData[pos + i] = temp;
+				}
+			} else if (runNumber == 2 && btwGap == 1) { // for run2 only consider 2 pile of stones with 1gap as one
+				count1 += count2;
+				for (int i = 0; i < btwGap; i++) {
+					temp=scoresArray[scoreArrayAdd + count1 - 1][3];
+					if(frontGap<3) temp/=4.5;
+					one_rawData[pos + i] = temp;
+				}
+			} else {//else just consider them as individuals
+				int j = 0;
+				for (int i = 3; i > 3 - btwGap; i--) {
+					temp=scoresArray[scoreArrayAdd + count1 - 1][i];
+					if(frontGap<3) temp/=4.5;
+					one_rawData[pos + j] = temp;
+					j++;
+				}
+			}
+		}
+		/*
+		if (frontGap == 0) {
+			System.out.println("front is blocked directly");
+		} else if (frontGap < 4) {
+			System.out.println("font is blocked indirectly with gap: " + frontGap);
+		}
+		if (blocked && btwGap == 0) {
+			System.out.println("end is blocked directly");
+		} else if (blocked) {
+			System.out.println("end is blocked indirectly with gap: " + btwGap);
+		}
+		*/
 	}
 }
+
+//막힌게 2칸 떨어져있으면 반대편 /4.5 3칸 떨어져있으면 그대
+//앞에 들어가는 점수들은 돌들에만 의존하지 말고 뒤의 갭과 앞의 돌들을 같이 고려하면 훨씬 좋을
+
