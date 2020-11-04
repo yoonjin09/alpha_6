@@ -19,6 +19,34 @@ public class evaluate { //
 		readBoWDir(board, scoreBoard, oppoTag, 1, DEFENSE);
 		// find location with highest point
 		// enter input
+		
+		//여기서부터는 점수입력 받은 걸로 입력해야함.
+			int[][] checkscore = new int[19][19]; //board 복사하기 위한 board.
+			int high_i = 0, high_j = 0;
+			int high_score=0;
+			/**
+			 * board에서 checkboard로 복사하기
+			 */
+			for(int i = 0; i< 19; i++) {
+				for(int j = 0; j< 19; j++) {
+					checkscore[i][j] = scoreBoard[i][j];
+				}
+			}
+			
+			for(int i = 0; i< 19; i++) {
+				for(int j = 0; j< 19; j++) {
+					if(high_score< checkscore[i][j]) {
+						high_score = checkscore[i][j];
+						high_i=i;
+						high_j=j;
+					}
+				}
+			}
+			
+			board[high_i][high_j]= aiTag;
+			
+			System.out.println("Input aiTage x" + run +", y" + run +".");
+			System.out.println();
 	}
 	/*
 	 * read board left to right, top to bottom, left top to right bottom, left
@@ -522,5 +550,7 @@ public class evaluate { //
 		*/
 	}
 }
+
 //막힌게 2칸 떨어져있으면 반대편 /4.5 3칸 떨어져있으면 그대
 //앞에 들어가는 점수들은 돌들에만 의존하지 말고 뒤의 갭과 앞의 돌들을 같이 고려하면 훨씬 좋을
+
