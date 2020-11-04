@@ -12,11 +12,11 @@ public class evaluate { //
 			{ 0, 0, 0, 2000 }, { 0, 0, 10, 25 }, { 15, 20, 30, 45 }, { 0, 5, 15, 30 }, { 0, 0, 0, 1000 },
 			{ 0, 0, 0, 1000 } };
 			*/
-	final static int[][] scoresArray = { { 13, 24, 44, 80 }, { 24, 1549, 2816, 5120 }, { 1549, 6195, 11264, 20480 }, { 0, 0, 0, 512000 },
-			{ 0, 0, 0, 512000 }, { 3, 6, 11, 20 }, { 6, 97, 176, 320 }, { 97, 387, 704, 1280 }, { 0, 0, 0, 102400 },
-			{ 0, 0, 0, 102400 }, { 53, 97, 176, 320 }, { 97, 387, 704, 1280 }, { 387, 24781, 45056, 81920 }, { 3, 6, 11, 20 },
-			{ 0, 0, 0, 2048000 }, { 13, 24, 44, 80 }, { 24, 1549, 2816, 5120 }, { 1549, 6195, 11264, 20480 }, { 0, 0, 0, 409600 },
-			{ 0, 0, 0, 409600 } };
+	final static int[][] scoresArray = { 
+			{ 13, 24, 44, 80 }, { 24, 1549, 2816, 5120 }, { 1549, 6195, 11264, 20480 }, { 0, 0, 0, 512000 }, { 0, 0, 0, 512000 }, 
+			{ 3, 6, 11, 20 }, { 6, 97, 176, 320 }, { 97, 387, 704, 1280 }, { 0, 0, 0, 102400 }, { 0, 0, 0, 102400 }, 
+			{ 53, 97, 176, 320 }, { 97, 387, 704, 1280 }, { 387, 24781, 45056, 81920 }, { 3, 6, 11, 20 }, { 0, 0, 0, 2048000 }, 
+			{ 13, 24, 44, 80 }, { 24, 1549, 2816, 5120 }, { 1549, 6195, 11264, 20480 }, { 0, 0, 0, 409600 }, { 0, 0, 0, 409600 } };
 
 	public static void aiTurn(int[][] board, int aiTag) {
 		System.out.println("----aiturn with tag: " + aiTag);
@@ -26,34 +26,55 @@ public class evaluate { //
 		readBoWDir(board, scoreBoard, oppoTag, 1, DEFENSE);
 		// find location with highest point
 		// enter input
+		aiInput(board, scoreBoard, aiTag);
+		initializeScoreBoard(scoreBoard);
 		
+		System.out.println("-----------------------------------move2------------------------------------------");
+		readBoWDir(board, scoreBoard, aiTag, 2, OFFENSE);
+		readBoWDir(board, scoreBoard, oppoTag, 2, DEFENSE);
+		// find location with highest point
+		// enter input
+		aiInput(board, scoreBoard, aiTag);
+		
+	}
+	static void initializeScoreBoard(int[][] scoreBoard) {
+		for(int i=0; i<19; i++) {
+			for(int j =0; j<19; j++){
+				scoreBoard[i][j]=0;
+			}
+		}
+	}
+	
+	static void aiInput(int[][] board, int[][] scoreBoard, int aiTag) {
 		//여기서부터는 점수입력 받은 걸로 입력해야함.
-			int[][] checkscore = new int[19][19]; //board 복사하기 위한 board.
-			int high_i = 0, high_j = 0;
-			int high_score=0;
-			/**
-			 * board에서 checkboard로 복사하기
-			 */
-			for(int i = 0; i< 19; i++) {
-				for(int j = 0; j< 19; j++) {
-					checkscore[i][j] = scoreBoard[i][j];
+		//int[][] checkscore = new int[19][19]; //board 복사하기 위한 board.
+		int high_i = 0, high_j = 0;
+		int high_score=0;
+		/**
+		 * board에서 checkboard로 복사하기
+		 */
+		/*
+		for(int i = 0; i< 19; i++) {
+			for(int j = 0; j< 19; j++) {
+				checkscore[i][j] = scoreBoard[i][j];
+			}
+		}
+		*/
+		
+		for(int i = 0; i< 19; i++) {
+			for(int j = 0; j< 19; j++) {
+				if(high_score< scoreBoard[i][j]) {
+					high_score = scoreBoard[i][j];
+					high_i=i;
+					high_j=j;
 				}
 			}
-			
-			for(int i = 0; i< 19; i++) {
-				for(int j = 0; j< 19; j++) {
-					if(high_score< checkscore[i][j]) {
-						high_score = checkscore[i][j];
-						high_i=i;
-						high_j=j;
-					}
-				}
-			}
-			
-			board[high_i][high_j]= aiTag;
-			
-			System.out.println("Input aiTage x" + run +", y" + run +".");
-			System.out.println();
+		}
+		
+		board[high_i][high_j]= aiTag;
+		
+		System.out.println("Input aiTage x" + high_i +", y" + high_j +".");
+		System.out.println();
 	}
 	/*
 	 * read board left to right, top to bottom, left top to right bottom, left
@@ -268,6 +289,7 @@ public class evaluate { //
 					for (int j = 1; j < 4; j++) {
 						if (pos + j >= onerawdatalen) {
 							System.out.println("end of line");
+							blocked=true;
 							break;
 						} else if (dummycell[pos + j] == oppoTag) {
 							System.out.println("blocked!");
@@ -288,11 +310,11 @@ public class evaluate { //
 						giveScore(one_rawData, frontGap, count1, btwGap, count2, stoStart, blocked, runNumber,
 								offOrDef);
 						// blocked 밝히고 btwGap이 뒤에 공간이라고 넘기고 계산
-					} else if (btwGap < 4) {
+					} else if (btwGap < 4) { // count2가 있다고 생각하는 case
 						// frontGap count1 gap count2 --> score
 						pos += btwGap;
 						count2Start = pos;
-						while (dummycell[pos] == userTag) {// i pointing at the space behind the stone after the loop,
+						while (pos<onerawdatalen&&dummycell[pos] == userTag) {// i pointing at the space behind the stone after the loop,
 															// may be 0 or oppo or 3
 							count2++;
 							pos++;
@@ -310,7 +332,7 @@ public class evaluate { //
 						System.out.println("bug2");
 					// check if there is stone within 3 blocks, no then isolated, yes then count
 					// them too
-					if (btwGap == 4 || blocked)
+					if (count2==0)
 						conti = false;
 					btwGap = 0;
 					blocked = false;
@@ -364,7 +386,10 @@ public class evaluate { //
 		default:
 			break;
 		}// end of switch
+		printDebug(scoreBoard);
 
+	}
+	public static void printDebug(int[][] scoreBoard) {
 		System.out.println("||x\\y\t   0    1    2    3    4    5    6    7    8    9    a    1    2    3    4    5    6    7    8");
 		for (int i = 0; i < 19; i++) {
 			System.out.printf("||%d\t", i);
@@ -381,90 +406,6 @@ public class evaluate { //
 			return 2;
 		else
 			return 1;
-	}
-
-	public static void diagnosis(int[] dummycell, int onerawdatalen, int userTag) {
-		int i = 0, stoStart = -1, frontGap = 0, btwGap = 0, count1 = 0, count2 = 0;
-		boolean conti = false, blocked = false;
-		int oppoTag = opponentTag(userTag);
-		System.out.print("dummies:");
-		for (int k = 0; k < onerawdatalen; k++) {
-			System.out.print(dummycell[k] + " ");
-		}
-		System.out.println();
-		while (i < onerawdatalen) {
-			int temp;
-			if ((temp = dummycell[i]) == oppoTag) {
-				if (conti) {
-					System.out.println("blocked directly " + frontGap + " " + count1 + " " + btwGap);
-					blocked = true;
-					// giveScore(); // blocked btwgap count1 frontgap
-
-					conti = false;
-					blocked = false;
-					frontGap = 0;
-					count1 = 0;
-				}
-				frontGap = 0;
-			} else if (temp == 0) {
-				if (conti) {// 앞에 돌이 잘 나오다가 빈 공간 따라서 뒤에 상태에 따라서 점수를 줘야헌다.
-					btwGap++;
-					for (int j = 1; j < 4; j++) {
-						if (i + j >= onerawdatalen) {
-							System.out.println("end of line");
-							break;
-						} else if (dummycell[i + j] == oppoTag) {
-							System.out.println("blocked!");
-							blocked = true;
-							break;
-						} else if (dummycell[i + j] == userTag)
-							break;
-						btwGap++;
-					}
-					System.out.println("btwgap==" + btwGap);
-					if (btwGap == 4) {
-						System.out.println("case isolated " + frontGap + " " + count1);
-						// giveScore();
-						// 여기서도 iso라고 밝히고 점수를 줘야
-					} else if (blocked) {
-						System.out.println("case blocked " + frontGap + " " + count1 + " " + btwGap);
-						// giveScore();
-						// blocked 밝히고 btwGap이 뒤에 공간이라고 넘기고 계산
-					} else if (btwGap < 4) {
-						// frontGap count1 gap count2 --> score
-						i += btwGap;
-						while (dummycell[i] == userTag) {// i pointing at the space behind the stone after the loop,
-															// may be 0 or oppo or 3
-							count2++;
-							i++;
-						}
-						System.out.println(
-								"case connected " + frontGap + " " + count1 + " " + btwGap + " " + count2 + " ");
-						// giveScore();
-						// 여기서 frontgap count1 btwgap count2로 점수를 처리하고 btwgap을 frontgap으로, count2을
-						// count1로 돌리면 그게 다음 돌들의 info가 된다.
-						// 그리고 그렇게 해서 frontgap에 점수를 넣을려고 하는데 있으면 안넣고 페스하면 된다. 그게 벽으로막혀있는 게 아니기때문에 점수를 짜게
-						// 줄 필요가 없다.
-					} else
-						System.out.println("bug2");
-					// check if there is stone within 3 blocks, no then isolated, yes then count
-					// them too
-					btwGap = 0;
-					conti = false;
-					blocked = false;
-					frontGap = 0;
-					count1 = count2;
-					count2 = 0;
-				}
-				frontGap++;
-			} else if (temp == userTag) {
-				if (stoStart == -1)
-					stoStart = i;
-				conti = true;
-				count1++;
-			}
-			i++;
-		} // while loop end
 	}
 
 	public static void giveScore(int[] one_rawData, int frontGap, int count1, int btwGap, int count2, int pos,

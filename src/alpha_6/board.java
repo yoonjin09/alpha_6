@@ -11,7 +11,7 @@ public class board {
 	public board() {
 		this.board=new int[19][19];
 		initializeBoard();
-		userTag=1;
+		userTag=2;
 		winchecker=false;
 		n=new Scanner(System.in);
 	}
@@ -257,6 +257,8 @@ public class board {
 			
 		boolean invalidInput;
 		do {
+			cor center=new cor(9, 9);
+			enterInput(center, 1);
 			System.out.print("plz input the number of the red stone: ");
 			numOfRed=this.n.nextInt();
 			this.n.nextLine();
@@ -287,11 +289,12 @@ public class board {
 		setGame();
 		printBoard();
 		do {
-			//if(userTag==aiTag) {
+			 if(userTag==aiTag) {
 				evaluate.aiTurn(this.board, this.aiTag);
-			//	printBoard();
-			//}
 				printBoard();
+				toggleUserTag();
+			}
+			//printBoard();
 			getInput();
 			printBoard();
 		}while(!winchecker);
