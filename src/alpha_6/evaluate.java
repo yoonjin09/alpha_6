@@ -6,12 +6,16 @@ public class evaluate { //
 	static cor move = new cor();
 	final static int LEFTRIGHT = 0, TOPDOWN = 1, TOPLBOTR = 2, BOTLTOPR = 3, OFFENSE = 1, DEFENSE = 2;
 
-	final static int[][] scoresArray = { 
+	final static int[][] scoresArray1 = { 
+			{ 13, 24, 44, 80 }, { 6, 97, 176, 320 }, { 1549, 6195, 11264, 20480 }, { 1024000, 4096000, 16384000, 65536000 }, { 1024000, 4096000, 16384000, 65536000 }, 
+			{ 3, 6, 11, 20 },  { 97, 387, 704, 1280 }, { 24, 1549, 2816, 5120 }, { 209600, 838400, 3353600, 13414400 }, { 209600, 838400, 3353600, 13414400 }, 
+			{ 53, 97, 176, 320 }, { 97, 387, 704, 1280 }, { 387, 24781, 45056, 81920 }, { 3, 6, 11, 20 }, { 167772160, 335544320, 671088640, 1342177000 }, 
+			{ 13, 24, 44, 80 }, { 24, 1549, 2816, 5120 }, { 1549, 6195, 11264, 20480 }, { 1310720, 2621440, 5242880, 10485760 }, { 1310720, 2621440, 5242880, 10485760  } };
+	final static int[][] scoresArray2 = { 
 			{ 13, 24, 44, 80 }, { 24, 1549, 2816, 5120 }, { 1549, 6195, 11264, 20480 }, { 1024000, 4096000, 16384000, 65536000 }, { 1024000, 4096000, 16384000, 65536000 }, 
 			{ 3, 6, 11, 20 }, { 6, 97, 176, 320 }, { 97, 387, 704, 1280 }, { 209600, 838400, 3353600, 13414400 }, { 209600, 838400, 3353600, 13414400 }, 
 			{ 53, 97, 176, 320 }, { 97, 387, 704, 1280 }, { 387, 24781, 45056, 81920 }, { 3, 6, 11, 20 }, { 167772160, 335544320, 671088640, 1342177000 }, 
 			{ 13, 24, 44, 80 }, { 24, 1549, 2816, 5120 }, { 1549, 6195, 11264, 20480 }, { 1310720, 2621440, 5242880, 10485760 }, { 1310720, 2621440, 5242880, 10485760  } };
-
 
 	/*
 	 * final static int[][] scoresArray = { { 5, 10, 20, 35 }, { 15, 20, 30, 45 }, {
@@ -29,22 +33,24 @@ public class evaluate { //
   */
 
 
-	public static void aiTurn(int[][] board, int aiTag) {
+	public static void aiTurn(int[][] board, int aiTag, int turn) {
 		System.out.println("----aiturn with tag: " + aiTag);
 		int oppoTag = opponentTag(aiTag);
 		int[][] scoreBoard = new int[19][19];
-		readBoWDir(board, scoreBoard, aiTag, 1, OFFENSE);
-		readBoWDir(board, scoreBoard, oppoTag, 1, DEFENSE);
+		readBoWDir(board, scoreBoard, aiTag, 1, OFFENSE, turn);
+		readBoWDir(board, scoreBoard, oppoTag, 1, DEFENSE, turn);
 		// find location with highest point
 		// enter input
+		printDebug(scoreBoard);
 		aiInput(board, scoreBoard, aiTag);
 		initializeScoreBoard(scoreBoard);
 
 		System.out.println("-----------------------------------move2------------------------------------------");
-		readBoWDir(board, scoreBoard, aiTag, 2, OFFENSE);
-		readBoWDir(board, scoreBoard, oppoTag, 2, DEFENSE);
+		readBoWDir(board, scoreBoard, aiTag, 2, OFFENSE, turn);
+		readBoWDir(board, scoreBoard, oppoTag, 2, DEFENSE, turn);
 		// find location with highest point
 		// enter input
+		printDebug(scoreBoard);
 		aiInput(board, scoreBoard, aiTag);
 
 	}
@@ -93,7 +99,7 @@ public class evaluate { //
 	 * (0,0) being left top corner; (18,0) being left bottom
 	 */
 
-	public static void readBoWDir(int[][] rawData, int[][] scoreBoard, int userTag, int runNumber, int offOrDef) {
+	public static void readBoWDir(int[][] rawData, int[][] scoreBoard, int userTag, int runNumber, int offOrDef, int turn) {
 		int k = 0;
 		int[] oneRow = new int[19];
 
@@ -106,7 +112,7 @@ public class evaluate { //
 					for (j = 0; j < 19; j++) {
 						oneRow[j] = rawData[i][j];
 					}
-					evaGiveScoreC1(scoreBoard, oneRow, 19, userTag, move, LEFTRIGHT, runNumber, offOrDef);
+					evaGiveScoreC1(scoreBoard, oneRow, 19, userTag, move, LEFTRIGHT, runNumber, offOrDef, turn);
 					break;
 				}
 			}
@@ -121,7 +127,7 @@ public class evaluate { //
 					for (j = 0; j < 19; j++) {
 						oneRow[j] = rawData[j][i];
 					}
-					evaGiveScoreC1(scoreBoard, oneRow, 19, userTag, move, TOPDOWN, runNumber, offOrDef);
+					evaGiveScoreC1(scoreBoard, oneRow, 19, userTag, move, TOPDOWN, runNumber, offOrDef, turn);
 					break;
 				}
 			}
@@ -139,7 +145,7 @@ public class evaluate { //
 						oneRow[j] = rawData[k][j];
 						k++;
 					}
-					evaGiveScoreC1(scoreBoard, oneRow, 19 - i, userTag, move, TOPLBOTR, runNumber, offOrDef);
+					evaGiveScoreC1(scoreBoard, oneRow, 19 - i, userTag, move, TOPLBOTR, runNumber, offOrDef, turn);
 					break;
 				}
 				k++;
@@ -157,7 +163,7 @@ public class evaluate { //
 						oneRow[k] = rawData[k][j];
 						k++;
 					}
-					evaGiveScoreC1(scoreBoard, oneRow, k, userTag, move, TOPLBOTR, runNumber, offOrDef);
+					evaGiveScoreC1(scoreBoard, oneRow, k, userTag, move, TOPLBOTR, runNumber, offOrDef, turn);
 					break;
 				}
 				k++;
@@ -176,7 +182,7 @@ public class evaluate { //
 						oneRow[j] = rawData[k][j];
 						k--;
 					}
-					evaGiveScoreC1(scoreBoard, oneRow, i + 1, userTag, move, BOTLTOPR, runNumber, offOrDef);
+					evaGiveScoreC1(scoreBoard, oneRow, i + 1, userTag, move, BOTLTOPR, runNumber, offOrDef, turn);
 					break;
 				}
 				k--;
@@ -196,7 +202,7 @@ public class evaluate { //
 						k--;
 						pos++;
 					}
-					evaGiveScoreC1(scoreBoard, oneRow, 18 - i, userTag, move, BOTLTOPR, runNumber, offOrDef);
+					evaGiveScoreC1(scoreBoard, oneRow, 18 - i, userTag, move, BOTLTOPR, runNumber, offOrDef, turn);
 					break;
 				}
 				k--;
@@ -216,7 +222,7 @@ public class evaluate { //
 	 */
 
 	public static void evaGiveScoreC1(int[][] scoreBoard, int dummycell[], int onerawdatalen, int userTag, cor move,
-			int direction, int runNumber, int offOrDef) {
+			int direction, int runNumber, int offOrDef, int turn) {
 		// int[] dummycell = new int[onerawdatalen]; // 만약 상대편 돌에 의해 쓰레기 cell 이 나올 때를
 		// 대비.
 		int[] one_rawData = new int[onerawdatalen];
@@ -283,7 +289,7 @@ public class evaluate { //
 					System.out.println("blocked directly " + frontGap + " " + count1 + " " + btwGap);
 					blocked = true;
 					giveScore(one_rawData, frontGap, count1, btwGap, count2, backGap, stoStart, blocked, backBlocked,
-							runNumber, offOrDef); // blocked
+							runNumber, offOrDef, turn); // blocked
 					// btwgap
 					// count1 frontgap
 
@@ -316,12 +322,12 @@ public class evaluate { //
 					if (btwGap == 4) {
 						System.out.println("case isolated " + frontGap + " " + count1);
 						giveScore(one_rawData, frontGap, count1, btwGap, count2, backGap, stoStart, blocked,
-								backBlocked, runNumber, offOrDef);
+								backBlocked, runNumber, offOrDef, turn);
 						// 여기서도 iso라고 밝히고 점수를 줘야
 					} else if (blocked) {
 						System.out.println("case blocked " + frontGap + " " + count1 + " " + btwGap);
 						giveScore(one_rawData, frontGap, count1, btwGap, count2, backGap, stoStart, blocked,
-								backBlocked, runNumber, offOrDef);
+								backBlocked, runNumber, offOrDef, turn);
 						// blocked 밝히고 btwGap이 뒤에 공간이라고 넘기고 계산
 					} else if (btwGap < 4) { // count2가 있다고 생각하는 case
 						// frontGap count1 gap count2 --> score
@@ -346,7 +352,7 @@ public class evaluate { //
 						System.out.println(
 								"case connected " + frontGap + " " + count1 + " " + btwGap + " " + count2 + " ");
 						giveScore(one_rawData, frontGap, count1, btwGap, count2, backGap, stoStart, blocked,
-								backBlocked, runNumber, offOrDef);
+								backBlocked, runNumber, offOrDef, turn);
 						// 여기서 frontgap count1 btwgap count2로 점수를 처리하고 btwgap을 frontgap으로, count2을
 						// count1로 돌리면 그게 다음 돌들의 info가 된다.
 						// 그리고 그렇게 해서 frontgap에 점수를 넣을려고 하는데 있으면 안넣고 페스하면 된다. 그게 벽으로막혀있는 게 아니기때문에 점수를 짜게
@@ -376,6 +382,11 @@ public class evaluate { //
 			}
 			pos++;
 		} // while loop end
+		System.out.print("this is one_rawdata:  ");
+		for(int i=0; i<onerawdatalen; i++) {
+			System.out.print(one_rawData[i]+" ");
+		}
+		System.out.println();
 
 		switch (direction)
 
@@ -412,7 +423,7 @@ public class evaluate { //
 			break;
 		}// end of switch
 
-		printDebug(scoreBoard);
+		
 
 	}
 
@@ -437,7 +448,12 @@ public class evaluate { //
 	}
 
 	public static void giveScore(int[] one_rawData, int frontGap, int count1, int btwGap, int count2, int backGap,
-			int pos, boolean blocked, boolean backBlocked, int runNumber, int offOrDef) {
+			int pos, boolean blocked, boolean backBlocked, int runNumber, int offOrDef, int turn) {
+		int[][] scoresArray;
+		if(turn<6) 
+			scoresArray=scoresArray1;
+		else
+			scoresArray=scoresArray2;
 		int scoreArrayAdd = 0, temp = 0;
 		if (runNumber == 1 && offOrDef == OFFENSE)
 			scoreArrayAdd = 0;
