@@ -296,12 +296,12 @@ public class board {
 		setGame();
 		printBoard();
 		do {
-			 if(userTag==aiTag) {
+			if(userTag==aiTag) {
 				evaluate.aiTurn(this.board, this.aiTag);
 				printBoard();
 				toggleUserTag();
 			}
-      if(winchecker)  ///////// 이거!!!
+			if(winchecker)  ///////// 이거!!!
 			break;
 			getInput();
 			printBoard();
