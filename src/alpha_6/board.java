@@ -61,7 +61,14 @@ public class board {
 		for(int i =0; i< 19; i++) {
 			System.out.printf("%2d\t", i);
 			for(int j=0; j<19; j++) {
-				System.out.printf("%d ", this.board[i][j]);
+				if(this.board[i][j] == 0 )
+					System.out.printf(" |");
+				if(this.board[i][j] == 1)
+					System.out.print("O|");
+				if(this.board[i][j] == 2)
+					System.out.print("X|");
+				if(this.board[i][j] == 3)
+					System.out.print("N|");
 			}
 			System.out.println();
 		}
@@ -294,7 +301,8 @@ public class board {
 				printBoard();
 				toggleUserTag();
 			}
-			//printBoard();
+      if(winchecker)  ///////// 이거!!!
+			break;
 			getInput();
 			printBoard();
 		}while(!winchecker);
