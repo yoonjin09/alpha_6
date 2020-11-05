@@ -5,6 +5,7 @@ import java.util.Scanner;
 public class board {
 	int [][]board;
 	int userTag, aiTag;
+	int turn;
 	Scanner n;
 	boolean winchecker;
 
@@ -14,6 +15,10 @@ public class board {
 		userTag=2;
 		winchecker=false;
 		n=new Scanner(System.in);
+	}
+	
+	private void increaseTurn() {
+		turn++;
 	}
 	
 	private void initializeBoard(){ //initialize the board and input 0 to all place
@@ -297,13 +302,16 @@ public class board {
 		printBoard();
 		do {
 			 if(userTag==aiTag) {
-				evaluate.aiTurn(this.board, this.aiTag);
+				evaluate.aiTurn(this.board, this.aiTag,this.turn);
 				printBoard();
 				toggleUserTag();
+				increaseTurn();
 			}
-      if(winchecker)  ///////// 이거!!!
-			break;
+			//printBoard();
+			if(winchecker)  ///////// 이거!!!
+				break;
 			getInput();
+			increaseTurn();
 			printBoard();
 		}while(!winchecker);
 		System.out.println(userTag + " Defeat.....!");
