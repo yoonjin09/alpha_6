@@ -1,3 +1,6 @@
+##최종코드는 아래 링크의 master 외 다른 branch에 있다.
+https://github.com/euncharm1ng/alpha_6.git
+
 # alpha_6
 
 실행순서:
